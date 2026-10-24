@@ -1,5 +1,7 @@
 package dev.dragonofshuu.fps.arena;
 
+import dev.dragonofshuu.fps.ShuuFPS;
+import org.slf4j.Logger;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -13,13 +15,14 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import dev.dragonofshuu.fps.modes.battleRoyale.BattleRoyaleGame;
 
 final class ArenaSnapshotPersistence {
+
+    static final Logger LOGGER = ShuuFPS.LOGGER;
 
     private ArenaSnapshotPersistence() {
     }
@@ -44,7 +47,7 @@ final class ArenaSnapshotPersistence {
                 .whenComplete((ignored, error) -> server.execute(() -> {
                     ArenaSnapshot.state = ArenaSnapshot.State.READY;
                     if (error != null) {
-                        ArenaSnapshot.LOGGER.error("Failed to save arena backup", error);
+                        LOGGER.error("Failed to save arena backup", error);
                         BattleRoyaleGame.broadcast(server,
                                 "Saving the backup failed; it is only kept in memory. Check the server log.");
                     } else {
@@ -63,7 +66,7 @@ final class ArenaSnapshotPersistence {
                 .runAsync(() -> writeConfigToDisk(dir, cx, cz, arenaSize), Util.ioPool())
                 .whenComplete((ignored, error) -> {
                     if (error != null) {
-                        ArenaSnapshot.LOGGER.error("Failed to save arena config", error);
+                        LOGGER.error("Failed to save arena config", error);
                     }
                 });
     }
@@ -80,13 +83,13 @@ final class ArenaSnapshotPersistence {
         }
 
         ArenaSnapshot.state = ArenaSnapshot.State.LOADING;
-        ArenaSnapshot.LOGGER.info("Loading arena backup from {}", dir);
+        LOGGER.info("Loading arena backup from {}", dir);
 
         ArenaSnapshot.pendingIo = java.util.concurrent.CompletableFuture
                 .supplyAsync(() -> readFromDisk(dir), Util.ioPool())
                 .whenComplete((backup, error) -> server.execute(() -> {
                     if (error != null || backup == null) {
-                        ArenaSnapshot.LOGGER.error("Failed to load arena backup", error);
+                        LOGGER.error("Failed to load arena backup", error);
                         ArenaSnapshot.state = ArenaSnapshot.State.EMPTY;
                         return;
                     }
@@ -98,7 +101,7 @@ final class ArenaSnapshotPersistence {
                     ArenaSnapshot.size = backup.size();
                     ArenaSnapshot.arenaConfigured = true;
                     ArenaSnapshot.state = ArenaSnapshot.State.READY;
-                    ArenaSnapshot.LOGGER.info("Loaded arena backup: {} chunks, size {}",
+                    LOGGER.info("Loaded arena backup: {} chunks, size {}",
                             backup.chunks().size(), backup.size());
                 }));
     }
@@ -196,7 +199,7 @@ final class ArenaSnapshotPersistence {
                 ArenaSnapshot.lives = config.getInt("Lives");
             }
         } catch (IOException e) {
-            ArenaSnapshot.LOGGER.error("Failed to load arena config", e);
+            LOGGER.error("Failed to load arena config", e);
         }
     }
 
@@ -205,7 +208,7 @@ final class ArenaSnapshotPersistence {
             CompoundTag meta = ArenaSnapshotCodec.readTag(dir.resolve(ArenaSnapshot.META_FILE));
             int dataVersion = meta.getInt("DataVersion");
             if (dataVersion != ArenaSnapshotCodec.currentDataVersion()) {
-                ArenaSnapshot.LOGGER.warn(
+                LOGGER.warn(
                         "Arena backup was made with data version {} (current {}). Some blocks may not restore correctly.",
                         dataVersion, ArenaSnapshotCodec.currentDataVersion());
             }
@@ -228,7 +231,7 @@ final class ArenaSnapshotPersistence {
 
             int expected = meta.getInt("ChunkCount");
             if (chunks.size() != expected) {
-                ArenaSnapshot.LOGGER.warn("Arena backup expected {} chunks but found {}", expected, chunks.size());
+                LOGGER.warn("Arena backup expected {} chunks but found {}", expected, chunks.size());
             }
 
             return new ArenaSnapshot.Backup(meta.getDouble("CenterX"), meta.getDouble("CenterZ"), meta.getInt("Size"),

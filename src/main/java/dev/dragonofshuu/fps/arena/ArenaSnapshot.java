@@ -1,7 +1,9 @@
 package dev.dragonofshuu.fps.arena;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Codec;
+import org.slf4j.Logger;
+
+import dev.dragonofshuu.fps.ShuuFPS;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
@@ -11,8 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
-
-import org.slf4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -26,7 +26,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public final class ArenaSnapshot {
 
-    static final Logger LOGGER = LogUtils.getLogger();
+    static final Logger LOGGER = ShuuFPS.LOGGER;
 
     enum State {
         EMPTY, CAPTURING, SAVING, LOADING, READY, RESTORING

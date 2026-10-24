@@ -1,6 +1,6 @@
 package dev.dragonofshuu.fps.shared;
 
-import dev.dragonofshuu.fps.BattleRoyale;
+import dev.dragonofshuu.fps.ShuuFPS;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,12 +13,12 @@ import net.minecraftforge.fml.common.Mod;
 /**
  * Shared client HUD rendering for match stats.
  */
-@Mod.EventBusSubscriber(modid = BattleRoyale.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = ShuuFPS.MOD_ID, value = Dist.CLIENT)
 public final class SharedHudOverlay {
 
-    private static final ResourceLocation SKULL_ICON = ResourceLocation.fromNamespaceAndPath(BattleRoyale.MOD_ID,
+    private static final ResourceLocation SKULL_ICON = ResourceLocation.fromNamespaceAndPath(ShuuFPS.MOD_ID,
             "textures/gui/skull.png");
-    private static final ResourceLocation TARGET_ICON = ResourceLocation.fromNamespaceAndPath(BattleRoyale.MOD_ID,
+    private static final ResourceLocation TARGET_ICON = ResourceLocation.fromNamespaceAndPath(ShuuFPS.MOD_ID,
             "textures/gui/target.png");
 
     private static final int PLAYER_ICON_SIZE = 8;

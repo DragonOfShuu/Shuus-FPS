@@ -19,6 +19,7 @@ public final class BattleRoyaleGameSettings {
     private static boolean priorNaturalRegeneration;
     private static boolean priorKeepInventory;
     private static boolean priorDoMobSpawning;
+    private static boolean priorImmediateRespawn;
     private static Difficulty priorDifficulty = Difficulty.NORMAL;
 
     private BattleRoyaleGameSettings() {
@@ -29,11 +30,13 @@ public final class BattleRoyaleGameSettings {
         priorNaturalRegeneration = rules.getRule(GameRules.RULE_NATURAL_REGENERATION).get();
         priorKeepInventory = rules.getRule(GameRules.RULE_KEEPINVENTORY).get();
         priorDoMobSpawning = rules.getRule(GameRules.RULE_DOMOBSPAWNING).get();
+        priorImmediateRespawn = rules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN).get();
         priorDifficulty = server.getWorldData().getDifficulty();
 
         rules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(false, server);
         rules.getRule(GameRules.RULE_KEEPINVENTORY).set(true, server);
         rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(false, server);
+        rules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN).set(true, server);
         server.getWorldData().setDifficulty(Difficulty.NORMAL);
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
@@ -58,6 +61,7 @@ public final class BattleRoyaleGameSettings {
         rules.getRule(GameRules.RULE_NATURAL_REGENERATION).set(priorNaturalRegeneration, server);
         rules.getRule(GameRules.RULE_KEEPINVENTORY).set(priorKeepInventory, server);
         rules.getRule(GameRules.RULE_DOMOBSPAWNING).set(priorDoMobSpawning, server);
+        rules.getRule(GameRules.RULE_DO_IMMEDIATE_RESPAWN).set(priorImmediateRespawn, server);
         server.getWorldData().setDifficulty(priorDifficulty);
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {

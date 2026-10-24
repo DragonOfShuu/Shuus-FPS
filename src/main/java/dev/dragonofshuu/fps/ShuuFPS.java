@@ -1,14 +1,17 @@
 package dev.dragonofshuu.fps;
 
+import com.mojang.logging.LogUtils;
+import org.slf4j.Logger;
+
 import dev.dragonofshuu.fps.shared.SharedUiNetworking;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod(BattleRoyale.MOD_ID)
-public class BattleRoyale {
+@Mod(ShuuFPS.MOD_ID)
+public class ShuuFPS {
     public static final String MOD_ID = "shuusfps";
+    public static Logger LOGGER = LogUtils.getLogger();
 
-    public BattleRoyale() {
+    public ShuuFPS() {
         SharedUiNetworking.register();
-        // Event handlers are registered via @Mod.EventBusSubscriber in ModEvents.
     }
 }

@@ -14,14 +14,14 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import dev.dragonofshuu.fps.BattleRoyale;
+import dev.dragonofshuu.fps.ShuuFPS;
 
 public final class SharedUiNetworking {
 
     private static final String PROTOCOL_VERSION = "1";
 
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(BattleRoyale.MOD_ID, "shared_ui"),
+            ResourceLocation.fromNamespaceAndPath(ShuuFPS.MOD_ID, "shared_ui"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);

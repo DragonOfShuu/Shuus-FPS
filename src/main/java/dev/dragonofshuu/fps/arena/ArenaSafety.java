@@ -1,5 +1,7 @@
 package dev.dragonofshuu.fps.arena;
 
+import java.util.List;
+
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,8 +13,6 @@ import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.AABB;
-
-import java.util.List;
 
 public final class ArenaSafety {
 
@@ -29,6 +29,14 @@ public final class ArenaSafety {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             player.setGameMode(GameType.SURVIVAL);
         }
+    }
+
+    public static void respawnPlayers(MinecraftServer server) {
+        server.getPlayerList().getPlayers().forEach(serverPlayer -> {
+            if (!serverPlayer.isAlive()) {
+                serverPlayer.server.getPlayerList().respawn(serverPlayer, false);
+            }
+        });
     }
 
     public static void clearPlayerInventories(MinecraftServer server) {

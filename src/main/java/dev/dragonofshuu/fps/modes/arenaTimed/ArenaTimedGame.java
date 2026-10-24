@@ -71,6 +71,7 @@ public final class ArenaTimedGame {
         timerTicks = durationSeconds * TICKS_PER_SECOND;
         phaseTicks = 0;
         phase = Phase.RUNNING;
+        ArenaSafety.respawnPlayers(server);
         ArenaSafety.setAllPlayersSurvival(server);
         ArenaTimedGameSettings.initiate(server);
 

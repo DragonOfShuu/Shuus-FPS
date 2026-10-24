@@ -26,7 +26,7 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = BattleRoyale.MOD_ID)
+@Mod.EventBusSubscriber(modid = ShuuFPS.MOD_ID)
 public final class ModEvents {
 
     private ModEvents() {

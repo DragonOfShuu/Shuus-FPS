@@ -80,6 +80,7 @@ public final class BattleRoyaleGame {
         timer = warTicks;
         postWinResetTicks = 0;
         noWinningConditionAtStart = false;
+        ArenaSafety.respawnPlayers(server);
         ArenaSafety.setAllPlayersSurvival(server);
         BattleRoyaleGameSettings.initiate(server);
 

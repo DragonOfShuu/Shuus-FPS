@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import dev.dragonofshuu.fps.ShuuFPS;
+
 /**
  * Handles dropping players into the arena from the sky with a temporary elytra
  * and fall damage immunity until they land.
@@ -25,14 +27,14 @@ import java.util.UUID;
 public final class PlayerDrop {
 
     /** Absolute Y level players are teleported to. */
-    private static final double DROP_HEIGHT = 500.0;
+    private static final double DROP_HEIGHT = 400.0;
     /**
      * Players spawn within this fraction of the border radius, keeping them away
      * from the edge.
      */
     private static final double SPREAD_FRACTION = 0.8;
     /** Ticks to wait after teleporting before checking for landing. */
-    private static final int GRACE_TICKS = 20;
+    private static final int GRACE_TICKS = 30;
 
     private static final String DATA_KEY = "BattleRoyaleDrop";
     private static final String ELYTRA_MARKER = "BattleRoyaleDropElytra";
@@ -94,6 +96,19 @@ public final class PlayerDrop {
 
             if (player.onGround() || player.isInWater() || player.isInLava()
                     || player.isPassenger() || player.isSpectator()) {
+                ShuuFPS.LOGGER.info("Finishing drop for player {}", player.getName().getString());
+                // Now for why the drop is being finished:
+                if (player.onGround()) {
+                    ShuuFPS.LOGGER.info("Player {} landed on the ground.", player.getName().getString());
+                } else if (player.isInWater()) {
+                    ShuuFPS.LOGGER.info("Player {} landed in water.", player.getName().getString());
+                } else if (player.isInLava()) {
+                    ShuuFPS.LOGGER.info("Player {} landed in lava.", player.getName().getString());
+                } else if (player.isPassenger()) {
+                    ShuuFPS.LOGGER.info("Player {} is a passenger.", player.getName().getString());
+                } else if (player.isSpectator()) {
+                    ShuuFPS.LOGGER.info("Player {} is a spectator.", player.getName().getString());
+                }
                 finishDrop(player);
             }
         }
@@ -116,7 +131,10 @@ public final class PlayerDrop {
                 if (player.getItemBySlot(EquipmentSlot.CHEST).isEmpty()) {
                     player.setItemSlot(EquipmentSlot.CHEST, previous);
                 } else if (!player.getInventory().add(previous)) {
-                    player.drop(previous, false);
+                    // player.drop(previous, false);
+                    // This is for giving the previous chest item back to the player if their chest
+                    // slot is occupied.
+                    // We are avoiding clutter though, so dropping is unnecessary.
                 }
             }
         }
@@ -139,9 +157,9 @@ public final class PlayerDrop {
     }
 
     public static void onRespawn(ServerPlayer player) {
-        if (!isDropping(player)) {
-            removeDropElytras(player); // Covers keepInventory
-        }
+        // if (!isDropping(player)) {
+        // removeDropElytras(player); // Covers keepInventory
+        // }
     }
 
     public static void onDeath(ServerPlayer player) {
@@ -154,7 +172,7 @@ public final class PlayerDrop {
         DROPPING.remove(player.getUUID());
 
         if (!previous.isEmpty()) {
-            player.drop(previous, true, false);
+            // player.drop(previous, true, false);
         }
     }
 

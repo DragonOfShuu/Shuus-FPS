@@ -5,8 +5,7 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 
-import com.mojang.logging.LogUtils;
-
+import dev.dragonofshuu.fps.ShuuFPS;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,7 +24,7 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public final class Loadout {
 
-    private static final Logger LOGGER = LogUtils.getLogger();
+    static final Logger LOGGER = ShuuFPS.LOGGER;
 
     private Loadout() {
     }
