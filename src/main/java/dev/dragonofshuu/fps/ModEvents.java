@@ -89,6 +89,7 @@ public final class ModEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             PlayerDrop.onLogin(player);
             SharedMatchStats.syncOne(player);
+            BattleRoyaleGame.onLogin(player);
             ArenaTimedGame.onLogin(player);
         }
     }

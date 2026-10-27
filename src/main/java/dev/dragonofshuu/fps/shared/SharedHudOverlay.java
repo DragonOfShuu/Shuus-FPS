@@ -4,7 +4,9 @@ import dev.dragonofshuu.fps.ShuuFPS;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.FluidTags;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -59,6 +61,8 @@ public final class SharedHudOverlay {
             return;
         }
 
+        LocalPlayer player = mc.player;
+
         MatchStatsSnapshot snapshot = SharedMatchStats.getClientSnapshot();
         if (snapshot.phase() != MatchPhase.RUNNING) {
             return;
@@ -71,14 +75,18 @@ public final class SharedHudOverlay {
 
         Font font = mc.font;
         GuiGraphics gui = event.getGuiGraphics();
-        int x = event.getWindow().getGuiScaledWidth() / 2 + 96;
-        int y = event.getWindow().getGuiScaledHeight() - 11;
+        // int x = event.getWindow().getGuiScaledWidth() / 2 - 91;
+        int x = 2;
+        // int y = event.getWindow().getGuiScaledHeight() - 69;
+        int y = event.getWindow().getGuiScaledHeight() - 31;
 
-        int killsWidth = drawKillsStat(gui, font, x, y, local.kills());
-        int deathsX = x + killsWidth + HUD_GROUP_PADDING;
-        int deathsWidth = drawDeathStat(gui, font, deathsX, y, local.deaths());
-        int livesX = deathsX + deathsWidth + HUD_GROUP_PADDING;
-        drawLivesStat(mc, gui, font, livesX, y, local.livesLeft());
+        // int killsWidth = drawKillsStat(gui, font, x, y, local.kills());
+        // int deathsX = x + killsWidth + HUD_GROUP_PADDING;
+        // int deathsWidth = drawDeathStat(gui, font, deathsX, y, local.deaths());
+        // int livesX = deathsX + deathsWidth + HUD_GROUP_PADDING;
+        drawKillsStat(gui, font, x, y, local.kills());
+        drawDeathStat(gui, font, x, y + 10, local.deaths());
+        drawLivesStat(mc, gui, font, x, y + 20, local.livesLeft());
 
         if (snapshot.timerSeconds() >= 0) {
             String timer = formatTimer(snapshot.timerSeconds());

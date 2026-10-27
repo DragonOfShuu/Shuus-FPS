@@ -20,6 +20,7 @@ import dev.dragonofshuu.fps.shared.Loadout;
 import dev.dragonofshuu.fps.shared.MatchPhase;
 import dev.dragonofshuu.fps.shared.ModBroadcasts;
 import dev.dragonofshuu.fps.shared.SharedMatchStats;
+import dev.dragonofshuu.fps.utils.DelayedServerTask;
 
 public final class BattleRoyaleGame {
 
@@ -142,6 +143,11 @@ public final class BattleRoyaleGame {
     public static void onPlayerLeave(ServerPlayer player) {
         BattleRoyaleHud.removePlayer(player);
         BattleRoyalePlayers.onPlayerLeave(player, ELIMINATED_TAG);
+        DelayedServerTask.runAfterTicks(10, () -> {
+            BattleRoyaleWinConditions.Outcome outcome = BattleRoyaleWinConditions.evaluate(
+                    player.server, LIVES_LEFT, noWinningConditionAtStart);
+            handleOutcome(player.server, outcome);
+        });
     }
 
     public static void onPlayerDeath(ServerPlayer player) {
