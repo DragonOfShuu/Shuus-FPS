@@ -17,7 +17,6 @@ import java.util.UUID;
 
 import dev.dragonofshuu.fps.shared.Loadout;
 import dev.dragonofshuu.fps.shared.PlayerDrop;
-import dev.dragonofshuu.fps.shared.Loadout.LoadoutClass;
 
 final class BattleRoyalePlayers {
 

@@ -28,25 +28,25 @@ public final class SharedHudOverlay {
     private static final int FACE_V = 8;
     private static final int SKIN_TEX_SIZE = 64;
 
-    private static boolean resultsScreenOpened;
+    // private static boolean resultsScreenOpened;
 
     private SharedHudOverlay() {
     }
 
-    @SubscribeEvent
-    public static void onRenderGlobalOverlay(RenderGuiOverlayEvent.Post event) {
-        if (!"minecraft:crosshair".equals(event.getOverlay().id().toString())) {
-            return;
-        }
+    // @SubscribeEvent
+    // public static void onRenderGlobalOverlay(RenderGuiOverlayEvent.Post event) {
+    // if (!"minecraft:crosshair".equals(event.getOverlay().id().toString())) {
+    // return;
+    // }
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null || mc.options.hideGui) {
-            return;
-        }
+    // Minecraft mc = Minecraft.getInstance();
+    // if (mc.player == null || mc.options.hideGui) {
+    // return;
+    // }
 
-        MatchStatsSnapshot snapshot = SharedMatchStats.getClientSnapshot();
-        handleFinalResultsPopup(mc, snapshot);
-    }
+    // // MatchStatsSnapshot snapshot = SharedMatchStats.getClientSnapshot();
+    // // handleFinalResultsPopup(mc, snapshot);
+    // }
 
     @SubscribeEvent
     public static void onRenderHealthOverlay(RenderGuiOverlayEvent.Post event) {
@@ -88,8 +88,6 @@ public final class SharedHudOverlay {
             gui.drawString(font, timer, timerX + 1, timerY + 1, 0x333333, false);
             gui.drawString(font, timer, timerX, timerY, 0xFFFFFF, false);
         }
-
-        handleFinalResultsPopup(mc, snapshot);
     }
 
     @SubscribeEvent
@@ -120,8 +118,6 @@ public final class SharedHudOverlay {
                 event.getWindow().getGuiScaledHeight(),
                 snapshot,
                 "Match Results");
-
-        handleFinalResultsPopup(mc, snapshot);
     }
 
     private static PlayerMatchStats findLocal(MatchStatsSnapshot snapshot) {
@@ -180,18 +176,11 @@ public final class SharedHudOverlay {
         gui.drawString(font, value, x, y, 0xFFFFFF, false);
     }
 
-    private static void handleFinalResultsPopup(Minecraft mc, MatchStatsSnapshot snapshot) {
-        boolean shouldShow = snapshot.showFinalResults() && "arena_timed".equals(snapshot.modeId())
-                && snapshot.phase() == MatchPhase.POST_GAME;
-
-        if (!shouldShow) {
-            resultsScreenOpened = false;
-            return;
-        }
-
-        if (!resultsScreenOpened) {
-            mc.setScreen(new MatchResultsScreen());
-            resultsScreenOpened = true;
+    public static void handleFinalResultsPopup(MatchStatsSnapshot snapshot) {
+        Minecraft mc = Minecraft.getInstance();
+        ShuuFPS.LOGGER.info("HANDLING MATCH RESULTS SCREEN ON THE CLIENT: {}", mc.player);
+        if (mc.player != null) {
+            mc.setScreen(new MatchResultsScreen(snapshot));
         }
     }
 }

@@ -45,6 +45,7 @@ public final class ArenaSnapshot {
     static final String CONFIG_FILE = "arena_config.dat";
 
     // Same codec vanilla uses to store chunk sections in region files.
+    @SuppressWarnings("deprecation")
     static final Codec<PalettedContainer<BlockState>> SECTION_CODEC = PalettedContainer.codecRW(
             Block.BLOCK_STATE_REGISTRY, BlockState.CODEC,
             PalettedContainer.Strategy.SECTION_STATES, Blocks.AIR.defaultBlockState());

@@ -3,7 +3,6 @@ package dev.dragonofshuu.fps.shared;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.scores.PlayerTeam;
-import net.minecraft.world.scores.Team;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,7 +20,6 @@ public final class SharedMatchStats {
     private static MatchPhase phase = MatchPhase.IDLE;
     private static String modeId = "";
     private static int timerSeconds = -1;
-    private static boolean showFinalResults;
 
     private static final Map<UUID, Integer> KILLS = new HashMap<>();
     private static final Map<UUID, Integer> DEATHS = new HashMap<>();
@@ -37,7 +35,6 @@ public final class SharedMatchStats {
         phase = MatchPhase.RUNNING;
         modeId = mode == null ? "" : mode;
         timerSeconds = -1;
-        showFinalResults = false;
         KILLS.clear();
         DEATHS.clear();
         LIVES.clear();
@@ -62,16 +59,20 @@ public final class SharedMatchStats {
         syncAll(server);
     }
 
-    public static void setShowFinalResults(MinecraftServer server, boolean show) {
-        showFinalResults = show;
-        syncAll(server);
-    }
+    // public static void setShowFinalResults(MinecraftServer server, boolean show)
+    // {
+    // showFinalResults = show;
+    // syncAll(server);
+    // }
+    // public static void setShowFinalResults(MinecraftServer server) {
+    // showFinalResults = true;
+    // syncAll(server);
+    // }
 
     public static void clear(MinecraftServer server) {
         phase = MatchPhase.IDLE;
         modeId = "";
         timerSeconds = -1;
-        showFinalResults = false;
         KILLS.clear();
         DEATHS.clear();
         LIVES.clear();
@@ -86,22 +87,22 @@ public final class SharedMatchStats {
     }
 
     public static void setLives(ServerPlayer player, int livesLeft) {
-        if (phase == MatchPhase.IDLE) {
+        if (phase != MatchPhase.RUNNING) {
             return;
         }
         LIVES.put(player.getUUID(), Math.max(0, livesLeft));
     }
 
     public static void recordDeath(ServerPlayer victim) {
-        if (phase == MatchPhase.IDLE) {
+        if (phase != MatchPhase.RUNNING) {
             return;
         }
         UUID victimId = victim.getUUID();
         DEATHS.merge(victimId, 1, Integer::sum);
     }
 
-    public static void recordKillIfPlayer(ServerPlayer killer) {
-        if (phase == MatchPhase.IDLE) {
+    public static void recordKillForPlayer(ServerPlayer killer) {
+        if (phase != MatchPhase.RUNNING) {
             return;
         }
         KILLS.merge(killer.getUUID(), 1, Integer::sum);
@@ -126,6 +127,13 @@ public final class SharedMatchStats {
         }
     }
 
+    public static void sendFinalResults(MinecraftServer server) {
+        MatchStatsSnapshot snapshot = buildServerSnapshot(server, null, true);
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            SharedUiNetworking.sendStatsSnapshot(player, withLocalPlayer(snapshot, player.getUUID()));
+        }
+    }
+
     public static void syncOne(ServerPlayer player) {
         MinecraftServer server = player.getServer();
         if (server == null) {
@@ -136,11 +144,16 @@ public final class SharedMatchStats {
     }
 
     private static MatchStatsSnapshot buildServerSnapshot(MinecraftServer server, UUID localPlayerId) {
+        return buildServerSnapshot(server, localPlayerId, false);
+    }
+
+    private static MatchStatsSnapshot buildServerSnapshot(MinecraftServer server, UUID localPlayerId,
+            boolean shouldShowFinalResults) {
         List<PlayerMatchStats> rows = new ArrayList<>();
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             UUID id = player.getUUID();
             PlayerTeam team = (PlayerTeam) player.getTeam();
-            Integer teamColor = null;
+            Integer teamColor = TeamColors.getTeamColor(team);
             if (team != null && team.getColor() != null && team.getColor().getColor() != null) {
                 teamColor = team.getColor().getColor();
             }
@@ -162,12 +175,20 @@ public final class SharedMatchStats {
                 .thenComparing(Comparator.comparingInt(PlayerMatchStats::livesLeft).reversed())
                 .thenComparing(PlayerMatchStats::playerName, String.CASE_INSENSITIVE_ORDER));
 
-        return new MatchStatsSnapshot(phase, modeId, timerSeconds, showFinalResults, localPlayerId, List.copyOf(rows));
+        return new MatchStatsSnapshot(phase, modeId, timerSeconds, localPlayerId, List.copyOf(rows),
+                shouldShowFinalResults);
     }
 
     private static MatchStatsSnapshot withLocalPlayer(MatchStatsSnapshot source, UUID localPlayerId) {
         return new MatchStatsSnapshot(source.phase(), source.modeId(), source.timerSeconds(),
-                source.showFinalResults(), localPlayerId, source.players());
+                localPlayerId, source.players(), source.shouldShowFinalResults());
+    }
+
+    public static void receiveClientSnapshot(MatchStatsSnapshot snapshot) {
+        setClientSnapshot(snapshot);
+        if (snapshot.shouldShowFinalResults()) {
+            SharedHudOverlay.handleFinalResultsPopup(snapshot);
+        }
     }
 
     public static void setClientSnapshot(MatchStatsSnapshot snapshot) {

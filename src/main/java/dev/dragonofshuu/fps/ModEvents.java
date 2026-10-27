@@ -139,7 +139,7 @@ public final class ModEvents {
 
                 Entity sourceEntity = event.getSource().getEntity();
                 if (sourceEntity instanceof ServerPlayer killer && !killer.getUUID().equals(player.getUUID())) {
-                    SharedMatchStats.recordKillIfPlayer(killer);
+                    SharedMatchStats.recordKillForPlayer(killer);
                 }
             }
 

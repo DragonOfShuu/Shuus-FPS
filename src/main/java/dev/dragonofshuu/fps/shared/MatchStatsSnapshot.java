@@ -10,11 +10,20 @@ public record MatchStatsSnapshot(
         MatchPhase phase,
         String modeId,
         int timerSeconds,
-        boolean showFinalResults,
         UUID localPlayerId,
-        List<PlayerMatchStats> players) {
+        List<PlayerMatchStats> players,
+        boolean shouldShowFinalResults) {
+
+    public MatchStatsSnapshot(
+            MatchPhase phase,
+            String modeId,
+            int timerSeconds,
+            UUID localPlayerId,
+            List<PlayerMatchStats> players) {
+        this(phase, modeId, timerSeconds, localPlayerId, players, false);
+    }
 
     public static MatchStatsSnapshot empty() {
-        return new MatchStatsSnapshot(MatchPhase.IDLE, "", -1, false, null, List.of());
+        return new MatchStatsSnapshot(MatchPhase.IDLE, "", -1, null, List.of(), false);
     }
 }

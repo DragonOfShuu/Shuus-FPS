@@ -1,6 +1,5 @@
 package dev.dragonofshuu.fps.modes.battleRoyale;
 
-import dev.dragonofshuu.fps.modes.battleRoyale.BattleRoyaleGame.Phase;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerBossEvent;

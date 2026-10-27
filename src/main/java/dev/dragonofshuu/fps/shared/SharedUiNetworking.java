@@ -49,7 +49,7 @@ public final class SharedUiNetworking {
             buf.writeEnum(packet.snapshot.phase());
             buf.writeUtf(packet.snapshot.modeId());
             buf.writeVarInt(packet.snapshot.timerSeconds());
-            buf.writeBoolean(packet.snapshot.showFinalResults());
+            buf.writeBoolean(packet.snapshot.shouldShowFinalResults());
 
             boolean hasLocalPlayer = packet.snapshot.localPlayerId() != null;
             buf.writeBoolean(hasLocalPlayer);
@@ -106,15 +106,15 @@ public final class SharedUiNetworking {
                     phase,
                     modeId,
                     timerSeconds,
-                    showFinalResults,
                     localPlayerId,
-                    List.copyOf(players)));
+                    List.copyOf(players),
+                    showFinalResults));
         }
 
         static void handle(StatsSnapshotPacket packet,
                 Supplier<net.minecraftforge.network.NetworkEvent.Context> contextSupplier) {
             net.minecraftforge.network.NetworkEvent.Context context = contextSupplier.get();
-            context.enqueueWork(() -> SharedMatchStats.setClientSnapshot(packet.snapshot));
+            context.enqueueWork(() -> SharedMatchStats.receiveClientSnapshot(packet.snapshot));
             context.setPacketHandled(true);
         }
     }

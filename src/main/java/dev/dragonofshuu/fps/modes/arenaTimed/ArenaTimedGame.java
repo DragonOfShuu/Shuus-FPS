@@ -120,7 +120,7 @@ public final class ArenaTimedGame {
     }
 
     public static void onPlayerRespawn(ServerPlayer player) {
-        if (!isActive() || phase == Phase.ENDING) {
+        if (phase != Phase.RUNNING) {
             return;
         }
 
@@ -149,7 +149,7 @@ public final class ArenaTimedGame {
             if (++phaseTicks >= POST_TITLE_TICKS) {
                 phase = Phase.RESULTS_SHOWN;
                 phaseTicks = 0;
-                SharedMatchStats.setShowFinalResults(server, true);
+                SharedMatchStats.sendFinalResults(server);
             }
             return;
         }
@@ -171,7 +171,6 @@ public final class ArenaTimedGame {
 
         SharedMatchStats.setTimerSeconds(server, 0);
         SharedMatchStats.setPhase(server, MatchPhase.POST_GAME);
-        SharedMatchStats.setShowFinalResults(server, false);
     }
 
     private static TimedOutcome determineOutcome(MinecraftServer server) {
@@ -204,11 +203,12 @@ public final class ArenaTimedGame {
 
         Comparator<CompetitorScore> rankOrder = Comparator
                 .comparingInt(CompetitorScore::kills).reversed()
-                .thenComparingInt(CompetitorScore::deaths)
-                .thenComparing(Comparator.comparingInt(CompetitorScore::lives).reversed());
+                .thenComparingInt(CompetitorScore::deaths);
+        // For when lives are added
+        // .thenComparing(Comparator.comparingInt(CompetitorScore::lives).reversed());
 
         CompetitorScore best = competitors.values().stream()
-                .max(rankOrder)
+                .min(rankOrder)
                 .orElse(null);
         if (best == null) {
             return new TimedOutcome(Set.of(), Set.of());

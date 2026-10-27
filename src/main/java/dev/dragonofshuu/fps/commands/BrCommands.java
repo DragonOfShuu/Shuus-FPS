@@ -152,31 +152,6 @@ public final class BrCommands {
         return 1;
     }
 
-    private static int backupArena(CommandContext<CommandSourceStack> ctx) {
-        CommandSourceStack source = ctx.getSource();
-        if (!requireOverworld(source))
-            return 0;
-
-        if (!ArenaSnapshot.hasArenaConfig()) {
-            source.sendFailure(
-                    Component.literal("Arena center/size not set. Use /br set center <size> or /br init <size>."));
-            return 0;
-        }
-
-        if (BattleRoyaleGame.isRunning()) {
-            source.sendFailure(Component.literal("Stop the current game before making a backup."));
-            return 0;
-        }
-        if (ArenaSnapshot.isBusy()) {
-            source.sendFailure(Component.literal("A backup or restore is already in progress."));
-            return 0;
-        }
-
-        ArenaSnapshot.beginCapture(source.getServer(), ArenaSnapshot.getCenterX(), ArenaSnapshot.getCenterZ(),
-                ArenaSnapshot.getSize());
-        return 1;
-    }
-
     private static int setCenter(CommandContext<CommandSourceStack> ctx) {
         CommandSourceStack source = ctx.getSource();
         if (!requireOverworld(source))

@@ -7,9 +7,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
 public final class MatchResultsScreen extends Screen {
+    public MatchStatsSnapshot snapshot;
 
-    public MatchResultsScreen() {
+    public MatchResultsScreen(MatchStatsSnapshot snapshot) {
         super(Component.literal("Match Results"));
+        this.snapshot = snapshot;
     }
 
     @Override
@@ -26,15 +28,19 @@ public final class MatchResultsScreen extends Screen {
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         this.renderBackground(guiGraphics);
 
-        MatchStatsSnapshot snapshot = SharedMatchStats.getClientSnapshot();
         MatchLeaderboardPanelRenderer.renderCenteredPanel(
                 guiGraphics,
                 Minecraft.getInstance().font,
                 this.width,
                 this.height,
-                snapshot,
+                this.snapshot,
                 "Match Results");
 
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }

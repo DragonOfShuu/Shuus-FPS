@@ -242,9 +242,6 @@ public final class BattleRoyaleGame {
 
         phase = Phase.SHRINKING;
         timer = shrinkTicks;
-
-        // broadcast(server, "The border is shrinking to " + (int) targetSize + "
-        // blocks!");
     }
 
     private static void endShrink(MinecraftServer server) {
@@ -256,8 +253,6 @@ public final class BattleRoyaleGame {
 
         phase = Phase.WAR;
         timer = warTicks;
-        // broadcast(server, "The border has stopped. Next shrink in "
-        // + (warTicks / TICKS_PER_SECOND) + " seconds.");
     }
 
     private static void announceNiceDeathAndReset(MinecraftServer server) {

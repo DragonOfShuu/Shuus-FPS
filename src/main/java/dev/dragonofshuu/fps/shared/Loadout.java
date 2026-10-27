@@ -195,9 +195,10 @@ public final class Loadout {
      * Looks the item up at runtime, so the gun mod is not a compile-time
      * dependency.
      */
-    private static void give(ServerPlayer player, String itemId, int count, boolean canDrop) {
-        give(player, itemId, count, canDrop, Optional.empty());
-    }
+    // private static void give(ServerPlayer player, String itemId, int count,
+    // boolean canDrop) {
+    // give(player, itemId, count, canDrop, Optional.empty());
+    // }
 
     private static void give(ServerPlayer player, String itemId, int count, boolean canDrop, CompoundTag tag) {
         give(player, itemId, count, canDrop, Optional.of(tag));
