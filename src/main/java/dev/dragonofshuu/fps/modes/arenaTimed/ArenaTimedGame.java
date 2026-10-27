@@ -64,9 +64,6 @@ public final class ArenaTimedGame {
             int borderSize, int durationSeconds) {
         ServerLevel level = server.overworld();
         WorldBorder border = level.getWorldBorder();
-        border.setCenter(centerX, centerZ);
-        border.setSize(borderSize);
-        border.setWarningBlocks(5);
 
         PLAYER_LOADOUTS.clear();
 
@@ -84,6 +81,10 @@ public final class ArenaTimedGame {
 
                     SharedMatchStats.startMatch(server, "arena_timed", eligiblePlayers(server), -1);
                     SharedMatchStats.setTimerSeconds(server, durationSeconds);
+
+                    border.setCenter(centerX, centerZ);
+                    border.setSize(borderSize);
+                    border.setWarningBlocks(5);
 
                     ArenaTimedAnnouncements.broadcast(server,
                             "Arena Timed started. Border: " + borderSize + " blocks. Duration: " + durationSeconds

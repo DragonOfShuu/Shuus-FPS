@@ -65,9 +65,6 @@ public final class BattleRoyaleGame {
             int borderSize, int warTime, int shrinkAmount, int shrinkTime, int lives) {
         ServerLevel level = server.overworld();
         WorldBorder border = level.getWorldBorder();
-        border.setCenter(centerX, centerZ);
-        border.setSize(borderSize);
-        border.setWarningBlocks(5);
 
         LIVES_LEFT.clear();
         PLAYER_LOADOUTS.clear();
@@ -82,31 +79,39 @@ public final class BattleRoyaleGame {
         postWinResetTicks = 0;
         noWinningConditionAtStart = false;
         SharedArenaSafety.respawnPlayers(server);
-        SharedArenaSafety.setAllPlayersSurvival(server);
-        BattleRoyaleGameSettings.initiate(server);
+        DelayedServerTask.runAfterTicks(5,
+                (waiting) -> SharedArenaSafety.areAllPlayersAlive(server, waiting % 20 == 0),
+                () -> {
+                    SharedArenaSafety.setAllPlayersSurvival(server);
+                    BattleRoyaleGameSettings.initiate(server);
 
-        // Drop participants into the arena and hand out starting gear
-        BattleRoyalePlayers.prepareParticipants(server, level, centerX, centerZ, borderSize, lives,
-                ELIMINATED_TAG, LIVES_LEFT, PLAYER_LOADOUTS);
+                    // Drop participants into the arena and hand out starting gear
+                    BattleRoyalePlayers.prepareParticipants(server, level, centerX, centerZ, borderSize, lives,
+                            ELIMINATED_TAG, LIVES_LEFT, PLAYER_LOADOUTS);
 
-        SharedMatchStats.startMatch(server,
-                "battle_royale",
-                server.getPlayerList().getPlayers().stream()
-                        .filter(player -> LIVES_LEFT.containsKey(player.getUUID()))
-                        .collect(Collectors.toList()),
-                lives);
+                    SharedMatchStats.startMatch(server,
+                            "battle_royale",
+                            server.getPlayerList().getPlayers().stream()
+                                    .filter(player -> LIVES_LEFT.containsKey(player.getUUID()))
+                                    .collect(Collectors.toList()),
+                            lives);
 
-        updateBar();
-        addAllPlayers(server);
+                    updateBar();
+                    addAllPlayers(server);
 
-        broadcast(server, "The battle has begun! Border: " + borderSize
-                + " blocks. First shrink in " + warTime + " seconds. Lives: " + lives + ".");
+                    border.setCenter(centerX, centerZ);
+                    border.setSize(borderSize);
+                    border.setWarningBlocks(5);
 
-        if (!BattleRoyaleWinConditions.hasWinningConditionPossible(server, LIVES_LEFT)) {
-            noWinningConditionAtStart = true;
-            BattleRoyaleAnnouncements.showActionBarToAll(server,
-                    "No Winning Condition Possible: Only One Player/Team");
-        }
+                    broadcast(server, "The battle has begun! Border: " + borderSize
+                            + " blocks. First shrink in " + warTime + " seconds. Lives: " + lives + ".");
+
+                    if (!BattleRoyaleWinConditions.hasWinningConditionPossible(server, LIVES_LEFT)) {
+                        noWinningConditionAtStart = true;
+                        BattleRoyaleAnnouncements.showActionBarToAll(server,
+                                "No Winning Condition Possible: Only One Player/Team");
+                    }
+                }); // End of DelayedServerTask
     }
 
     public static void stop(MinecraftServer server) {
