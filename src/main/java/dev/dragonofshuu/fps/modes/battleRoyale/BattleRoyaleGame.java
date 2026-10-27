@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import dev.dragonofshuu.fps.arena.ArenaSafety;
 import dev.dragonofshuu.fps.arena.ArenaSnapshot;
+import dev.dragonofshuu.fps.shared.SharedArenaSafety;
 import dev.dragonofshuu.fps.shared.Loadout;
 import dev.dragonofshuu.fps.shared.MatchPhase;
 import dev.dragonofshuu.fps.shared.ModBroadcasts;
@@ -80,8 +80,8 @@ public final class BattleRoyaleGame {
         timer = warTicks;
         postWinResetTicks = 0;
         noWinningConditionAtStart = false;
-        ArenaSafety.respawnPlayers(server);
-        ArenaSafety.setAllPlayersSurvival(server);
+        SharedArenaSafety.respawnPlayers(server);
+        SharedArenaSafety.setAllPlayersSurvival(server);
         BattleRoyaleGameSettings.initiate(server);
 
         // Drop participants into the arena and hand out starting gear
@@ -109,11 +109,14 @@ public final class BattleRoyaleGame {
     }
 
     public static void stop(MinecraftServer server) {
+        if (!isActive()) {
+            return;
+        }
         BattleRoyaleGameSettings.end(server);
         BattleRoyalePlayers.restoreEliminatedPlayers(server, ELIMINATED_TAG);
-        ArenaSafety.clearGroundItems(server);
-        ArenaSafety.clearPlayerInventories(server);
-        ArenaSafety.setAllPlayersAdventure(server);
+        SharedArenaSafety.clearGroundItems(server);
+        SharedArenaSafety.clearPlayerInventories(server);
+        SharedArenaSafety.setAllPlayersAdventure(server);
         resetBorder(server);
         SharedMatchStats.clear(server);
         reset();
@@ -138,6 +141,7 @@ public final class BattleRoyaleGame {
 
     public static void onPlayerLeave(ServerPlayer player) {
         BattleRoyaleHud.removePlayer(player);
+        BattleRoyalePlayers.onPlayerLeave(player, ELIMINATED_TAG);
     }
 
     public static void onPlayerDeath(ServerPlayer player) {
@@ -200,6 +204,16 @@ public final class BattleRoyaleGame {
             return;
         }
 
+        BattleRoyalePlayers.eliminatePlayer(player, ELIMINATED_TAG);
+    }
+
+    public static void onLogin(ServerPlayer player) {
+        if (!isActive()) {
+            return;
+        }
+
+        player.sendSystemMessage(
+                Component.literal("You must wait for the next game to join!").withStyle(ChatFormatting.RED));
         BattleRoyalePlayers.eliminatePlayer(player, ELIMINATED_TAG);
     }
 
@@ -281,9 +295,9 @@ public final class BattleRoyaleGame {
             return;
         }
 
-        ArenaSafety.clearGroundItems(server);
-        ArenaSafety.clearPlayerInventories(server);
-        ArenaSafety.setAllPlayersAdventure(server);
+        SharedArenaSafety.clearGroundItems(server);
+        SharedArenaSafety.clearPlayerInventories(server);
+        SharedArenaSafety.setAllPlayersAdventure(server);
 
         if (isActive()) {
             stop(server);

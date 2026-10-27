@@ -18,7 +18,7 @@ import dev.dragonofshuu.fps.ShuuFPS;
 
 public final class SharedUiNetworking {
 
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "1.1";
 
     private static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             ResourceLocation.fromNamespaceAndPath(ShuuFPS.MOD_ID, "shared_ui"),

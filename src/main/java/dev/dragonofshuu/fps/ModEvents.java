@@ -10,6 +10,7 @@ import dev.dragonofshuu.fps.shared.PlayerDrop;
 import dev.dragonofshuu.fps.shared.RechargeSystem;
 import dev.dragonofshuu.fps.shared.SharedMatchStats;
 import net.minecraft.server.MinecraftServer;
+import dev.dragonofshuu.fps.utils.DelayedServerTask;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -48,6 +49,7 @@ public final class ModEvents {
             ArenaTimedGame.tick(server);
             PlayerDrop.tick(server);
             RechargeSystem.tick(server);
+            DelayedServerTask.onServerTick(server);
         }
     }
 
@@ -60,15 +62,9 @@ public final class ModEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         // Don't let the server shut down halfway through writing a backup
         ArenaSnapshot.awaitPendingIo();
-    }
-
-    @SubscribeEvent
-    public static void onServerStopped(ServerStoppedEvent event) {
-        // Static state survives between singleplayer worlds in the same session, so
-        // clear it.
         SharedMatchStats.clear(event.getServer());
-        BattleRoyaleGame.reset();
-        ArenaTimedGame.reset();
+        BattleRoyaleGame.stop(event.getServer());
+        ArenaTimedGame.stop(event.getServer());
         ArenaSnapshot.clear();
         PlayerDrop.clear();
         SharedMatchStats.clearClientSnapshot();
@@ -76,10 +72,24 @@ public final class ModEvents {
     }
 
     @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        // Static state survives between singleplayer worlds in the same session, so
+        // clear it.
+        // SharedMatchStats.clear(event.getServer());
+        // BattleRoyaleGame.stop(event.getServer());
+        // ArenaTimedGame.stop(event.getServer());
+        // ArenaSnapshot.clear();
+        // PlayerDrop.clear();
+        // SharedMatchStats.clearClientSnapshot();
+        // RechargeSystem.clear();
+    }
+
+    @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             PlayerDrop.onLogin(player);
             SharedMatchStats.syncOne(player);
+            ArenaTimedGame.onLogin(player);
         }
     }
 
@@ -87,7 +97,7 @@ public final class ModEvents {
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             BattleRoyaleGame.onPlayerLeave(player);
-            // Arena Timed has no mode-specific leave cleanup currently.
+            ArenaTimedGame.onPlayerLeave(player);
             PlayerDrop.onLogout(player);
             RechargeSystem.clearPlayer(player);
         }

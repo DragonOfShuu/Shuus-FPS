@@ -20,17 +20,22 @@ final class ArenaTimedPlayers {
             double centerX, double centerZ, int borderSize,
             Map<UUID, Loadout.LoadoutClass> playerLoadouts) {
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (player.isSpectator() || player.isCreative()) {
-                continue;
-            }
-
-            Loadout.LoadoutClass loadoutClass = randomLoadoutClass();
-            playerLoadouts.put(player.getUUID(), loadoutClass);
-
-            clearForFreshLoadout(player);
-            Loadout.giveLoadout(player, loadoutClass);
-            PlayerDrop.drop(level, player, centerX, centerZ, borderSize);
+            prepareParticipant(player, level, centerX, centerZ, borderSize, playerLoadouts);
         }
+    }
+
+    static void prepareParticipant(ServerPlayer player, ServerLevel level, double centerX, double centerZ,
+            int borderSize, Map<UUID, Loadout.LoadoutClass> playerLoadouts) {
+        if (player.isSpectator() || player.isCreative()) {
+            return;
+        }
+
+        Loadout.LoadoutClass loadoutClass = randomLoadoutClass();
+        playerLoadouts.put(player.getUUID(), loadoutClass);
+
+        clearForFreshLoadout(player);
+        Loadout.giveLoadout(player, loadoutClass);
+        PlayerDrop.drop(level, player, centerX, centerZ, borderSize);
     }
 
     static void respawnToDrop(ServerPlayer player, Map<UUID, Loadout.LoadoutClass> playerLoadouts) {
@@ -63,5 +68,12 @@ final class ArenaTimedPlayers {
     private static Loadout.LoadoutClass randomLoadoutClass() {
         Loadout.LoadoutClass[] classes = Loadout.LoadoutClass.values();
         return classes[(int) (Math.random() * classes.length)];
+    }
+
+    public static void onPlayerLeave(ServerPlayer player) {
+        // throw new UnsupportedOperationException("Unimplemented method
+        // 'onPlayerLeave'");
+        clearForFreshLoadout(player);
+        ArenaTimedGameSettings.endForPlayer(player);
     }
 }

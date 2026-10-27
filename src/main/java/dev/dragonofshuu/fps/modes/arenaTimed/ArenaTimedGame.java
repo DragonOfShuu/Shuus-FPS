@@ -3,6 +3,7 @@ package dev.dragonofshuu.fps.modes.arenaTimed;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.border.WorldBorder;
 
 import java.util.HashMap;
@@ -12,12 +13,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import dev.dragonofshuu.fps.arena.ArenaSafety;
 import dev.dragonofshuu.fps.arena.ArenaSnapshot;
+import dev.dragonofshuu.fps.shared.SharedArenaSafety;
 import dev.dragonofshuu.fps.shared.Loadout;
 import dev.dragonofshuu.fps.shared.MatchPhase;
 import dev.dragonofshuu.fps.shared.PlayerMatchStats;
 import dev.dragonofshuu.fps.shared.SharedMatchStats;
+import dev.dragonofshuu.fps.utils.DelayedServerTask;
 
 import java.util.Comparator;
 
@@ -71,24 +73,32 @@ public final class ArenaTimedGame {
         timerTicks = durationSeconds * TICKS_PER_SECOND;
         phaseTicks = 0;
         phase = Phase.RUNNING;
-        ArenaSafety.respawnPlayers(server);
-        ArenaSafety.setAllPlayersSurvival(server);
-        ArenaTimedGameSettings.initiate(server);
+        SharedArenaSafety.respawnPlayers(server);
+        DelayedServerTask.runAfterTicks(5,
+                (waiting) -> SharedArenaSafety.areAllPlayersAlive(server, waiting % 20 == 0),
+                () -> {
+                    SharedArenaSafety.setAllPlayersSurvival(server);
+                    ArenaTimedGameSettings.initiate(server);
 
-        ArenaTimedPlayers.prepareParticipants(server, level, centerX, centerZ, borderSize, PLAYER_LOADOUTS);
+                    ArenaTimedPlayers.prepareParticipants(server, level, centerX, centerZ, borderSize, PLAYER_LOADOUTS);
 
-        SharedMatchStats.startMatch(server, "arena_timed", eligiblePlayers(server), -1);
-        SharedMatchStats.setTimerSeconds(server, durationSeconds);
+                    SharedMatchStats.startMatch(server, "arena_timed", eligiblePlayers(server), -1);
+                    SharedMatchStats.setTimerSeconds(server, durationSeconds);
 
-        ArenaTimedAnnouncements.broadcast(server,
-                "Arena Timed started. Border: " + borderSize + " blocks. Duration: " + durationSeconds + "s.");
+                    ArenaTimedAnnouncements.broadcast(server,
+                            "Arena Timed started. Border: " + borderSize + " blocks. Duration: " + durationSeconds
+                                    + "s.");
+                });
     }
 
     public static void stop(MinecraftServer server) {
+        if (!isActive()) {
+            return;
+        }
         ArenaTimedGameSettings.end(server);
-        ArenaSafety.clearGroundItems(server);
-        ArenaSafety.clearPlayerInventories(server);
-        ArenaSafety.setAllPlayersAdventure(server);
+        SharedArenaSafety.clearGroundItems(server);
+        SharedArenaSafety.clearPlayerInventories(server);
+        SharedArenaSafety.setAllPlayersAdventure(server);
         resetBorder(server);
         SharedMatchStats.clear(server);
         reset();
@@ -126,6 +136,26 @@ public final class ArenaTimedGame {
 
         ArenaTimedGameSettings.applyRevisedMaxHealth(player);
         ArenaTimedPlayers.respawnToDrop(player, PLAYER_LOADOUTS);
+    }
+
+    public static void onLogin(ServerPlayer player) {
+        if (!isActive()) {
+            return;
+        }
+
+        player.setGameMode(GameType.SURVIVAL);
+        ArenaTimedGameSettings.applyRevisedMaxHealth(player);
+        var worldBorder = player.serverLevel().getWorldBorder();
+        ArenaTimedPlayers.prepareParticipant(player, player.serverLevel(), worldBorder.getCenterX(),
+                worldBorder.getCenterZ(), (int) worldBorder.getSize(), PLAYER_LOADOUTS);
+    }
+
+    public static void onPlayerLeave(ServerPlayer player) {
+        if (!isActive()) {
+            return;
+        }
+
+        ArenaTimedPlayers.onPlayerLeave(player);
     }
 
     public static void tick(MinecraftServer server) {
@@ -241,9 +271,9 @@ public final class ArenaTimedGame {
             return;
         }
 
-        ArenaSafety.clearGroundItems(server);
-        ArenaSafety.clearPlayerInventories(server);
-        ArenaSafety.setAllPlayersAdventure(server);
+        SharedArenaSafety.clearGroundItems(server);
+        SharedArenaSafety.clearPlayerInventories(server);
+        SharedArenaSafety.setAllPlayersAdventure(server);
 
         if (isActive()) {
             stop(server);

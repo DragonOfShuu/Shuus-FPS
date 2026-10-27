@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import org.slf4j.Logger;
 
 import dev.dragonofshuu.fps.shared.SharedUiNetworking;
+import dev.dragonofshuu.fps.shared.SharedArenaSafetyNetworking;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod(ShuuFPS.MOD_ID)
@@ -13,5 +14,6 @@ public class ShuuFPS {
 
     public ShuuFPS() {
         SharedUiNetworking.register();
+        SharedArenaSafetyNetworking.register();
     }
 }

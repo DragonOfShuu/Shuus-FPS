@@ -64,11 +64,15 @@ public final class ArenaTimedGameSettings {
         server.getWorldData().setDifficulty(priorDifficulty);
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            Double originalMaxHealth = ORIGINAL_MAX_HEALTH.remove(player.getUUID());
-            if (originalMaxHealth != null) {
-                player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(originalMaxHealth);
-            }
-            player.setHealth(Math.min(player.getHealth(), player.getMaxHealth()));
+            endForPlayer(player);
         }
+    }
+
+    public static void endForPlayer(ServerPlayer player) {
+        Double originalMaxHealth = ORIGINAL_MAX_HEALTH.remove(player.getUUID());
+        if (originalMaxHealth != null) {
+            player.getAttribute(Attributes.MAX_HEALTH).setBaseValue(originalMaxHealth);
+        }
+        player.setHealth(Math.min(player.getHealth(), player.getMaxHealth()));
     }
 }

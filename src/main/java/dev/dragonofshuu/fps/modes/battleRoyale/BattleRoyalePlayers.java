@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.border.WorldBorder;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -45,6 +46,12 @@ final class BattleRoyalePlayers {
         }
     }
 
+    public static void onPlayerLeave(ServerPlayer player, String eliminatedTag) {
+        clearForFreshLoadout(player);
+        BattleRoyaleGameSettings.endForPlayer(player);
+        restoreEliminatedPlayer(player, eliminatedTag);
+    }
+
     static void respawnToDrop(ServerPlayer player, Map<UUID, Loadout.LoadoutClass> playerLoadouts) {
         MinecraftServer server = player.getServer();
         if (server == null) {
@@ -80,22 +87,38 @@ final class BattleRoyalePlayers {
     }
 
     static void restoreEliminatedPlayers(MinecraftServer server, String eliminatedTag) {
-        ServerLevel level = server.overworld();
-        WorldBorder border = level.getWorldBorder();
-        double centerX = border.getCenterX();
-        double centerZ = border.getCenterZ();
-        int safeY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Mth.floor(centerX), Mth.floor(centerZ)) + 1;
+        // ServerLevel level = server.overworld();
+        // WorldBorder border = level.getWorldBorder();
+        // double centerX = border.getCenterX();
+        // double centerZ = border.getCenterZ();
+        // int safeY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+        // Mth.floor(centerX), Mth.floor(centerZ)) + 1;
 
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            if (!player.getTags().contains(eliminatedTag)) {
-                continue;
-            }
+            // if (!player.getTags().contains(eliminatedTag)) {
+            // continue;
+            // }
 
-            player.removeTag(eliminatedTag);
-            player.setGameMode(GameType.SURVIVAL);
-            player.teleportTo(level, centerX, safeY, centerZ, player.getYRot(), player.getXRot());
+            // player.removeTag(eliminatedTag);
+            // player.setGameMode(GameType.SURVIVAL);
+            // player.teleportTo(level, centerX, safeY, centerZ, player.getYRot(),
+            // player.getXRot());
+            restoreEliminatedPlayer(player, eliminatedTag);
         }
+    }
+
+    static void restoreEliminatedPlayer(ServerPlayer player, String eliminatedTag) {
+        if (!player.getTags().contains(eliminatedTag)) {
+            return;
+        }
+        player.removeTag(eliminatedTag);
+        player.setGameMode(GameType.SURVIVAL);
+
+        ServerLevel level = player.serverLevel();
+
+        int safeY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                Mth.floor(player.getX()), Mth.floor(player.getZ())) + 1;
+        player.teleportTo(level, player.getX(), safeY, player.getZ(), player.getYRot(), player.getXRot());
     }
 
     static List<ServerPlayer> getContenders(MinecraftServer server, Map<UUID, Integer> livesLeft) {
@@ -120,4 +143,5 @@ final class BattleRoyalePlayers {
         Loadout.LoadoutClass[] classes = Loadout.LoadoutClass.values();
         return classes[(int) (Math.random() * classes.length)];
     }
+
 }

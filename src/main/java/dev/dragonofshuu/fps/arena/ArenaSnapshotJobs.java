@@ -16,6 +16,7 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import java.util.HashMap;
 import java.util.Map;
 
+import dev.dragonofshuu.fps.shared.SharedArenaSafety;
 import dev.dragonofshuu.fps.shared.ModBroadcasts;
 
 final class ArenaSnapshotJobs {
@@ -154,9 +155,9 @@ final class ArenaSnapshotJobs {
             return;
         }
 
-        ArenaSafety.clearGroundItems(level, ArenaSnapshot.centerX, ArenaSnapshot.centerZ, ArenaSnapshot.size);
-        ArenaSafety.clearPlayerInventories(server);
-        ArenaSafety.setAllPlayersAdventure(server);
+        SharedArenaSafety.clearGroundItems(level, ArenaSnapshot.centerX, ArenaSnapshot.centerZ, ArenaSnapshot.size);
+        SharedArenaSafety.clearPlayerInventories(server);
+        SharedArenaSafety.setAllPlayersAdventure(server);
 
         ArenaSnapshot.state = ArenaSnapshot.State.READY;
         ModBroadcasts.broadcastToOps(server, "Arena restored.");
