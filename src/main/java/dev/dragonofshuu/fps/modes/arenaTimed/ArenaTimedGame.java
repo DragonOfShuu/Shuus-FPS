@@ -130,7 +130,7 @@ public final class ArenaTimedGame {
         }
     }
 
-    public static void onPlayerRespawn(ServerPlayer player) {
+    public static void onRespawn(ServerPlayer player) {
         if (phase != Phase.RUNNING) {
             return;
         }
@@ -151,7 +151,7 @@ public final class ArenaTimedGame {
                 worldBorder.getCenterZ(), (int) worldBorder.getSize(), PLAYER_LOADOUTS);
     }
 
-    public static void onPlayerLeave(ServerPlayer player) {
+    public static void onLogout(ServerPlayer player) {
         if (!isActive()) {
             return;
         }

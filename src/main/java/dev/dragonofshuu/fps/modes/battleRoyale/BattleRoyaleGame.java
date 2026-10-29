@@ -145,7 +145,7 @@ public final class BattleRoyaleGame {
         border.setCenter(0, 0);
     }
 
-    public static void onPlayerLeave(ServerPlayer player) {
+    public static void onLogout(ServerPlayer player) {
         BattleRoyaleHud.removePlayer(player);
         BattleRoyalePlayers.onPlayerLeave(player, ELIMINATED_TAG);
         DelayedServerTask.runAfterTicks(10, () -> {
@@ -195,7 +195,7 @@ public final class BattleRoyaleGame {
         }
     }
 
-    public static void onPlayerRespawn(ServerPlayer player) {
+    public static void onRespawn(ServerPlayer player) {
         if (!isActive() || phase == Phase.ENDING || player.isCreative()) {
             return;
         }

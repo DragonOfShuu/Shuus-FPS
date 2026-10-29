@@ -3,6 +3,7 @@ package dev.dragonofshuu.fps.modes.arenaTimed;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.border.WorldBorder;
 
 import java.util.Map;
@@ -75,5 +76,6 @@ final class ArenaTimedPlayers {
         // 'onPlayerLeave'");
         clearForFreshLoadout(player);
         ArenaTimedGameSettings.endForPlayer(player);
+        player.setGameMode(GameType.ADVENTURE);
     }
 }

@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import dev.dragonofshuu.fps.shared.Loadout;
 import dev.dragonofshuu.fps.shared.PlayerDrop;
+import dev.dragonofshuu.fps.shared.SharedArenaSafety;
 
 final class BattleRoyalePlayers {
 
@@ -50,6 +51,7 @@ final class BattleRoyalePlayers {
         clearForFreshLoadout(player);
         BattleRoyaleGameSettings.endForPlayer(player);
         restoreEliminatedPlayer(player, eliminatedTag);
+        player.setGameMode(GameType.ADVENTURE);
     }
 
     static void respawnToDrop(ServerPlayer player, Map<UUID, Loadout.LoadoutClass> playerLoadouts) {
@@ -87,22 +89,7 @@ final class BattleRoyalePlayers {
     }
 
     static void restoreEliminatedPlayers(MinecraftServer server, String eliminatedTag) {
-        // ServerLevel level = server.overworld();
-        // WorldBorder border = level.getWorldBorder();
-        // double centerX = border.getCenterX();
-        // double centerZ = border.getCenterZ();
-        // int safeY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-        // Mth.floor(centerX), Mth.floor(centerZ)) + 1;
-
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-            // if (!player.getTags().contains(eliminatedTag)) {
-            // continue;
-            // }
-
-            // player.removeTag(eliminatedTag);
-            // player.setGameMode(GameType.SURVIVAL);
-            // player.teleportTo(level, centerX, safeY, centerZ, player.getYRot(),
-            // player.getXRot());
             restoreEliminatedPlayer(player, eliminatedTag);
         }
     }

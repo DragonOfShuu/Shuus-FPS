@@ -71,18 +71,21 @@ public final class ModEvents {
         RechargeSystem.clear();
     }
 
-    @SubscribeEvent
-    public static void onServerStopped(ServerStoppedEvent event) {
-        // Static state survives between singleplayer worlds in the same session, so
-        // clear it.
-        // SharedMatchStats.clear(event.getServer());
-        // BattleRoyaleGame.stop(event.getServer());
-        // ArenaTimedGame.stop(event.getServer());
-        // ArenaSnapshot.clear();
-        // PlayerDrop.clear();
-        // SharedMatchStats.clearClientSnapshot();
-        // RechargeSystem.clear();
-    }
+    // This event gets called AFTER the server is fully stopped and all players are
+    // gone.
+    // Kind of useless for us since we need most of that data in most situations.
+    // @SubscribeEvent
+    // public static void onServerStopped(ServerStoppedEvent event) {
+    // // Static state survives between singleplayer worlds in the same session, so
+    // // clear it.
+    // // SharedMatchStats.clear(event.getServer());
+    // // BattleRoyaleGame.stop(event.getServer());
+    // // ArenaTimedGame.stop(event.getServer());
+    // // ArenaSnapshot.clear();
+    // // PlayerDrop.clear();
+    // // SharedMatchStats.clearClientSnapshot();
+    // // RechargeSystem.clear();
+    // }
 
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
@@ -97,8 +100,8 @@ public final class ModEvents {
     @SubscribeEvent
     public static void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
-            BattleRoyaleGame.onPlayerLeave(player);
-            ArenaTimedGame.onPlayerLeave(player);
+            BattleRoyaleGame.onLogout(player);
+            ArenaTimedGame.onLogout(player);
             PlayerDrop.onLogout(player);
             RechargeSystem.clearPlayer(player);
         }
@@ -108,8 +111,8 @@ public final class ModEvents {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             RechargeSystem.onRespawn(player);
-            BattleRoyaleGame.onPlayerRespawn(player);
-            ArenaTimedGame.onPlayerRespawn(player);
+            BattleRoyaleGame.onRespawn(player);
+            ArenaTimedGame.onRespawn(player);
             PlayerDrop.onRespawn(player);
         }
     }

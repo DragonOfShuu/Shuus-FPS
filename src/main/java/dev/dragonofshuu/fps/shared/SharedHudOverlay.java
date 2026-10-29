@@ -61,8 +61,6 @@ public final class SharedHudOverlay {
             return;
         }
 
-        LocalPlayer player = mc.player;
-
         MatchStatsSnapshot snapshot = SharedMatchStats.getClientSnapshot();
         if (snapshot.phase() != MatchPhase.RUNNING) {
             return;
@@ -75,10 +73,9 @@ public final class SharedHudOverlay {
 
         Font font = mc.font;
         GuiGraphics gui = event.getGuiGraphics();
-        // int x = event.getWindow().getGuiScaledWidth() / 2 - 91;
         int x = 2;
         // int y = event.getWindow().getGuiScaledHeight() - 69;
-        int y = event.getWindow().getGuiScaledHeight() - 31;
+        int y = event.getWindow().getGuiScaledHeight() / 2 - 15;
 
         // int killsWidth = drawKillsStat(gui, font, x, y, local.kills());
         // int deathsX = x + killsWidth + HUD_GROUP_PADDING;
